@@ -1,0 +1,3 @@
+Tarkeaa tekstia.
+Tama teksti kasittelee sita miksi tassa tekstissa ei oke a kirjeimen isoveljea jolla on kaksisilmaa paanpaalla.
+Se juhtuu siita etta se on hupsua.
