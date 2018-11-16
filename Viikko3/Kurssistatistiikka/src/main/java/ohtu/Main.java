@@ -1,8 +1,12 @@
 package ohtu;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import java.io.IOException;
 import org.apache.http.client.fluent.Request;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 public class Main {
 
@@ -34,9 +38,9 @@ public class Main {
 
             for (Submission submission : subs) {
                 if (course.getName().equals(submission.getCourse())) {
-                    
+
                     submission.setMaxExercises(course.getExercises()[submission.getWeek()]);
-                    
+
                     System.out.print("\n" + submission);
                     tehtavat += submission.getExercises().length;
                     tunnit += submission.getHours();
@@ -46,6 +50,35 @@ public class Main {
                 System.out.println("Ei osallistumista\n");
             } else {
                 System.out.println("\n\nYhteensa: " + tehtavat + "/" + course.getTotalExercises() + " tehtavaa ja " + tunnit + " tuntia\n");
+
+                String url = "https://studies.cs.helsinki.fi/courses/" + course.getName() + "/stats";
+                String bodyText = Request.Get(url).execute().returnContent().asString();
+
+                JsonParser parser = new JsonParser();
+                JsonObject parsittuData = parser.parse(bodyText).getAsJsonObject();
+
+                int students = 0;
+                double hours = 0;
+                int eT = 0;
+
+                for (int i = 1; i < course.getExercises().length; i++) {
+
+                    JsonObject instance = parsittuData.getAsJsonObject("" + i);
+                    if (instance != null) {
+                        students += Integer.parseInt(instance.getAsJsonPrimitive("students").toString());
+                        hours += Double.parseDouble(instance.getAsJsonPrimitive("hour_total").toString());
+                        eT += Integer.parseInt(instance.getAsJsonPrimitive("exercise_total").toString());
+                    }
+                }
+                //CourseInfo[] courseInfos = mapper.fromJson(array, CourseInfo[].class);
+
+//                for(CourseInfo ci : courseInfos) {
+//                    students += ci.getStudents();
+//                    hours += ci.getHour_total();
+//                    eT += ci.getExercise_total();
+//                }
+                System.out.println("Kurssilla yhteensa " + students + " palautusta, palautettuja tehtavia " + eT + " ja aikaa kaytetty " + hours + "\n");
+
             }
         }
 
