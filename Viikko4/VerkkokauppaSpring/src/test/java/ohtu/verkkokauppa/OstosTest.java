@@ -16,13 +16,6 @@ import org.junit.Test;
 
 public class OstosTest {
 
-    Kauppa kauppa;
-
-    @Before
-    public void setUp() {
-        kauppa = mock(Kauppa.class);
-    }
-
     @Test
     public void tilimaksuKutsutaan1() {
         Pankki pankki = mock(Pankki.class);
@@ -46,7 +39,6 @@ public class OstosTest {
 
         // sitten suoritetaan varmistus, että pankin metodia tilisiirto on kutsuttu
         verify(pankki).tilisiirto(eq("pekka"), anyInt(), eq("12345"), anyString(), eq(5));
-        // toistaiseksi ei välitetty kutsussa käytetyistä parametreista
     }
 
     @Test
@@ -75,7 +67,6 @@ public class OstosTest {
 
         // sitten suoritetaan varmistus, että pankin metodia tilisiirto on kutsuttu
         verify(pankki).tilisiirto(eq("pouta"), anyInt(), eq("54321"), anyString(), eq(8));
-        // toistaiseksi ei välitetty kutsussa käytetyistä parametreista
     }
 
     @Test
@@ -102,7 +93,6 @@ public class OstosTest {
 
         // sitten suoritetaan varmistus, että pankin metodia tilisiirto on kutsuttu
         verify(pankki).tilisiirto(eq("poutapekka"), anyInt(), eq("5432112345"), anyString(), eq(10));
-        // toistaiseksi ei välitetty kutsussa käytetyistä parametreista
     }
 
     @Test
@@ -131,7 +121,89 @@ public class OstosTest {
 
         // sitten suoritetaan varmistus, että pankin metodia tilisiirto on kutsuttu
         verify(pankki).tilisiirto(eq("poutekka"), anyInt(), eq("54322345"), anyString(), eq(5));
-        // toistaiseksi ei välitetty kutsussa käytetyistä parametreista
+    }
+
+    @Test
+    public void aloitaAsinointiNollaa() {
+        Pankki pankki = mock(Pankki.class);
+        
+        Viitegeneraattori viite = mock(Viitegeneraattori.class);
+        
+        when(viite.uusi()).thenReturn(43);
+
+        Varasto varasto = mock(Varasto.class);
+        
+        when(varasto.saldo(1)).thenReturn(10);
+        when(varasto.saldo(2)).thenReturn(2);
+        when(varasto.haeTuote(1)).thenReturn(new Tuote(1, "maito", 5));
+        when(varasto.haeTuote(2)).thenReturn(new Tuote(2, "voi", 3));
+
+        // sitten testattava kauppa 
+        Kauppa k = new Kauppa(varasto, pankki, viite);
+
+        // tehdään ostokset
+        k.aloitaAsiointi();
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(2);
+        k.tilimaksu("poutekka", "54322345");
+
+        // sitten suoritetaan varmistus, että pankin metodia tilisiirto on kutsuttu
+        verify(pankki).tilisiirto(eq("poutekka"), anyInt(), eq("54322345"), anyString(), eq(8));
+        
+        k.aloitaAsiointi();
+
+        // tehdään ostokset
+        k.aloitaAsiointi();
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(2);
+        k.tilimaksu("poutukka", "74322347");
+        
+        verify(pankki).tilisiirto(eq("poutukka"), anyInt(), eq("74322347"), anyString(), eq(18));
+        
+    }
+
+    @Test
+    public void pyydetaanUusiViiteNumero() {
+        Pankki pankki = mock(Pankki.class);
+        
+        Viitegeneraattori viite = mock(Viitegeneraattori.class);
+        
+        when(viite.uusi()).thenReturn(43);
+
+        Varasto varasto = mock(Varasto.class);
+        
+        when(varasto.saldo(1)).thenReturn(10);
+        when(varasto.saldo(2)).thenReturn(2);
+        when(varasto.haeTuote(1)).thenReturn(new Tuote(1, "maito", 5));
+        when(varasto.haeTuote(2)).thenReturn(new Tuote(2, "voi", 3));
+
+        // sitten testattava kauppa 
+        Kauppa k = new Kauppa(varasto, pankki, viite);
+
+        // tehdään ostokset
+        k.aloitaAsiointi();
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(2);
+        k.tilimaksu("poutekka", "54322345");
+
+        // sitten suoritetaan varmistus, että pankin metodia tilisiirto on kutsuttu
+        verify(pankki).tilisiirto(eq("poutekka"), anyInt(), eq("54322345"), anyString(), eq(8));
+        
+        k.aloitaAsiointi();
+
+        // tehdään ostokset
+        k.aloitaAsiointi();
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(1);
+        k.lisaaKoriin(2);
+        k.tilimaksu("poutukka", "74322347");
+        
+        verify(pankki).tilisiirto(eq("poutukka"), anyInt(), eq("74322347"), anyString(), eq(18));
+        
+        verify(viite, times(2)).uusi();
     }
 
 }
