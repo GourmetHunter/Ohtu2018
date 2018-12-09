@@ -14,23 +14,36 @@ import laskin.Sovelluslogiikka;
  * @author Olli K. Kärki
  */
 public abstract class Komento {
-
+    
     protected TextField tuloskentta;
     protected TextField syotekentta;
     protected Sovelluslogiikka sovellus;
-    protected Button nollaa;
-
-    public Komento(Sovelluslogiikka sovellus, TextField tuloskentta, TextField syotekentta, Button nollaa) {
+    
+    private Button nollaa;
+    private Button undo;
+    
+    private String oldTulos;
+    private boolean oldNollaa;
+    
+    public Komento(Sovelluslogiikka sovellus, TextField tuloskentta, TextField syotekentta, Button nollaa, Button undo) {
         this.sovellus = sovellus;
         this.tuloskentta = tuloskentta;
         this.syotekentta = syotekentta;
         this.nollaa = nollaa;
+        this.undo = undo;
+        this.oldTulos = "";
+        this.oldNollaa = false;
     }
-
+    
     public abstract void suorita();
-
-    public abstract void peru();
-
+    
+    public void peru() {
+        tuloskentta.setText(oldTulos);
+        syotekentta.setText("");
+        nollaa.disableProperty().set(oldNollaa);
+        undo.disableProperty().set(true);
+    }
+    
     protected int getArvo(TextField kentta) {
         try {
             return Integer.parseInt(kentta.getText());
@@ -39,11 +52,19 @@ public abstract class Komento {
             return 0;
         }
     }
-
+    
     protected void esitaTulos() {
+        this.tallennaVanha();
         int tulos = sovellus.tulos();
         syotekentta.setText("");
         tuloskentta.setText("" + tulos);
         nollaa.disableProperty().set(tulos == 0);
+        undo.disableProperty().set(false);
     }
+    
+    private void tallennaVanha() {
+        oldTulos = tuloskentta.getText();
+        oldNollaa = nollaa.disableProperty().get();
+    }
+    
 }

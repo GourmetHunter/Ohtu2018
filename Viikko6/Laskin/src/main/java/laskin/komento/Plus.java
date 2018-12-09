@@ -15,19 +15,14 @@ import laskin.Sovelluslogiikka;
  */
 public class Plus extends Komento {
 
-    public Plus(Sovelluslogiikka sovellus, TextField tuloskentta, TextField syotekentta, Button nollaa) {
-        super(sovellus, tuloskentta, syotekentta, nollaa);
+    public Plus(Sovelluslogiikka sovellus, TextField tuloskentta, TextField syotekentta, Button nollaa, Button undo) {
+        super(sovellus, tuloskentta, syotekentta, nollaa, undo);
     }
 
     @Override
     public void suorita() {
         sovellus.plus(super.getArvo(syotekentta));
         esitaTulos();
-    }
-
-    @Override
-    public void peru() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

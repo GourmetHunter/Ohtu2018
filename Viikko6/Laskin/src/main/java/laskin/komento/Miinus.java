@@ -15,8 +15,8 @@ import laskin.Sovelluslogiikka;
  */
 public class Miinus extends Komento {
 
-    public Miinus(Sovelluslogiikka sovellus, TextField tuloskentta, TextField syotekentta, Button nollaa) {
-        super(sovellus, tuloskentta, syotekentta, nollaa);
+    public Miinus(Sovelluslogiikka sovellus, TextField tuloskentta, TextField syotekentta, Button nollaa, Button undo) {
+        super(sovellus, tuloskentta, syotekentta, nollaa, undo);
     }
 
     @Override
@@ -24,11 +24,6 @@ public class Miinus extends Komento {
         sovellus.miinus(getArvo(syotekentta));
         esitaTulos();
         
-    }
-
-    @Override
-    public void peru() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
